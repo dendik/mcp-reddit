@@ -6,7 +6,7 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS uv
 WORKDIR /app
 
 # Copy the project descriptor files for dependency installation
-COPY pyproject.toml uv.lock /app/
+COPY pyproject.toml uv.lock README.md /app/
 
 # Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1
@@ -28,11 +28,14 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM python:3.13-slim-bookworm
 
 WORKDIR /app
- 
-COPY --from=uv /app/.venv /app/.venv
 
-# Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
+# Copy the pyproject.toml, README.md, and source code
+COPY --from=uv /app/pyproject.toml /app/
+COPY --from=uv /app/README.md /app/
+COPY src /app/src
 
-# Set the entry point for the container
+# Install dependencies using pip and pyproject.toml
+RUN pip install --no-cache-dir -e .
+
+# Set the default command for the container
 CMD ["mcp-reddit"]
