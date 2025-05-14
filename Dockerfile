@@ -36,4 +36,4 @@ COPY --from=uv --chown=app:app /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Set the entry point for the container
-ENTRYPOINT ["mcp-reddit"]
+RUN ["mcp-reddit"]
